@@ -1,10 +1,11 @@
 <?php
 
-use App\Http\Controllers\AgentController;
 use App\Http\Controllers\BottleController;
 use App\Http\Controllers\BottleRequestController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SubscriptionPlanController;
+use App\Http\Controllers\TailorsController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -20,23 +21,13 @@ Route::prefix('admin')->middleware('auth')->group(function () {
     Route::get('/requests', [DashboardController::class, 'requests'])->name('admin.requests');
 
     Route::resource('users', UserController::class);
-    Route::resource('agents', AgentController::class);
-    Route::resource('bottles', BottleController::class);
+    Route::resource('subscription-plan', SubscriptionPlanController::class);
+    Route::controller(TailorsController::class)->name('tailors.')->prefix('tailors')->group(function () {
+        Route::get('/', 'index')->name('index');
+    });
+
 });
 
-Route::prefix('agent')->middleware('auth')->name('agent.')->group(function () {
-    Route::get('/dashboard', [DashboardController::class, 'agent'])->name('dashboard');
-    Route::controller(BottleRequestController::class)->group(function () {
-        Route::get('/new-requests', 'new_requests')->name('requests');
-        Route::post('/new-requests', 'store_requests')->name('store_requests');
-        Route::get('/my-requests', 'my_requests')->name('my_requets');
-        Route::get('/lookup', 'lookup')->name('requests.lookup');
-        Route::put('/request-approve/{id}', 'request_approve')->name('requests.approve');
-    });
-    Route::get('/profile', function () {
-        return view('agent.profile');
-    })->name('profile');
-});
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

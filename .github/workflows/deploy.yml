@@ -1,0 +1,72 @@
+name: Ubudozi App Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Install PHP 8.2
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2'
+
+    - name: Check for Composer updates
+      id: composer-check
+      run: |
+        php check-composer.php
+
+    - name: Install Composer dependencies if updates available
+      if: steps.composer-check.outputs.exit_code == '0'
+      run: |
+        curl -sS https://getcomposer.org/installer | php
+        php composer.phar install --no-interaction --prefer-dist
+
+    - name: Copy .env.example to .env
+      run: cp .env.example .env
+
+    - name: Generate Laravel application key
+      run: php artisan key:generate
+
+    - name: Transfer files via SSH
+      uses: appleboy/scp-action@master
+      with:
+        host: 86.38.243.108
+        username: u573317500
+        password: aA4=YzUDGV/s
+        port: 65002
+        source: '.'  # Path to your Laravel project
+        target: '/home/u573317500/domains/nigoote.com/public_html/kmn'  # Destination directory on the server
+
+    - name: Create symbolic link
+      uses: appleboy/ssh-action@master
+      with:
+        host: 86.38.243.108
+        username: u573317500
+        password: aA4=YzUDGV/s
+        port: 65002
+        script: |
+          ln -s /home/u573317500/domains/nigoote.com/public_html/kmn/public /home/u573317500/domains/nigoote.com/public_html/kmn/public_html
+
+    - name: SSH into server and run deployment commands
+      uses: appleboy/ssh-action@master
+      with:
+        host: 86.38.243.108
+        username: u573317500
+        password: aA4=YzUDGV/s
+        port: 65002
+        script: |
+          cd /home/u573317500/domains/nigoote.com/public_html/kmn
+          php artisan config:cache
+          php artisan route:cache
+          php artisan view:cache
+          php artisan config:clear
+          php artisan route:clear
+          php artisan view:clear

@@ -21,7 +21,7 @@
                 {{-- <a href="/">
                     <x-application-logo class="w-20 h-20 fill-current text-gray-500" />
                 </a> --}}
-                <h1 class="text-2xl font-bold">K-Gas MIS</h1>
+                <h1 class="text-2xl font-bold">{{ env('APP_NAME',"UBUDOZI APP") }}</h1>
             </div>
 
             <div class="w-full sm:max-w-md mt-6 px-6 py-4 bg-white shadow-md overflow-hidden sm:rounded-lg">

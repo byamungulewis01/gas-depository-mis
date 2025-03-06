@@ -12,7 +12,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = User::where('role', 'admin')->orderByDesc('id')->get();
+        $users = User::orderByDesc('id')->get();
 
         return view('admin.users', compact('users'));
     }
@@ -36,10 +36,10 @@ class UserController extends Controller
             'phone' => 'required|min:10|max:255',
             'status' => 'required|in:active,inactive',
         ]);
-        $request->merge(['role' => 'admin', 'password' => 'password']);
+        $request->merge(['password' => 'password']);
         User::create($request->all());
 
-        return back();
+        return back()->with('success', 'User created successfully');
     }
 
     /**
@@ -71,7 +71,7 @@ class UserController extends Controller
         ]);
         $user->update($request->all());
 
-        return back();
+        return back()->with('success', 'User updated successfully');
     }
 
     /**
@@ -80,6 +80,6 @@ class UserController extends Controller
     public function destroy(User $user)
     {
         $user->delete();
-        return back();
+        return back()->with('success', 'User deleted successfully');
     }
 }
